@@ -15,7 +15,7 @@ frontend/out/
 release/
 
 # Database
-backend/data/*.sqlite3
+*.sqlite3
 
 # Env
 backend/.env

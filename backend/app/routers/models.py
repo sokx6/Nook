@@ -7,8 +7,8 @@ async def list_models():
     models = list_ollama_models()
     if not models:
         models = [{
-            "id": f"ollama:{setting.ollama_default_model}"
-            "name": setting.ollama_default_model
+            "id": f"ollama:{setting.ollama_default_model}",
+            "name": setting.ollama_default_model,
             "provider": "ollama",
             "local": True
         }]

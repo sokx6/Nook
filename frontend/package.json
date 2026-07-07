@@ -1,0 +1,30 @@
+{
+  "name": "nook",
+  "version": "0.0.1",
+  "description": "uiFramework",
+  "keywords": [
+    "UI",
+    "frontend"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "tbf"
+  },
+  "license": "MIT",
+  "author": "anrans",
+  "type": "commonjs",
+  "main": "postcss.config.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "tbf"
+  },
+  "devDependencies": {
+    "@types/uuid": "^10.0.0",
+    "electron": "^43.0.0"
+  },
+  "dependencies": {
+    "electron-store": "^11.0.2",
+    "uuid": "^14.0.1",
+    "zustand": "^5.0.14"
+  }
+}

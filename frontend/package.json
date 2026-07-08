@@ -19,11 +19,20 @@
     "test": "tbf"
   },
   "devDependencies": {
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
     "@types/uuid": "^10.0.0",
+    "@vitejs/plugin-react": "^6.0.3",
     "electron": "^43.0.0"
   },
   "dependencies": {
     "electron-store": "^11.0.2",
+    "highlight.js": "^11.11.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-markdown": "^10.1.0",
+    "rehype-highlight": "^7.0.2",
+    "remark-gfm": "^4.0.1",
     "uuid": "^14.0.1",
     "zustand": "^5.0.14"
   }

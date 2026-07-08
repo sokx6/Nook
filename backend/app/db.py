@@ -2,6 +2,7 @@ import sqlite3
 import uuid
 from datetime import datetime,timezone
 from pathlib import Path
+from app.schemas import ConversationInfo
 DB_PATH=Path(__file__).parent.parent.parent/"data"/"chatbot.sqlite3"
 
 def get_db() -> sqlite3.Connection:
@@ -60,14 +61,14 @@ def create_conversations(title:str|None=None)-> dict:
     finally:
         conn.close()
 
-def get_conversations(conversation_id:str)-> dict|None:
+def get_conversation(conversation_id:str)-> ConversationInfo|None:
     conn=get_db()
     try:
         row=conn.execute(
             "select id,title,created_at,updated_at from conversations where id=?",
             (conversation_id,)
         ).fetchone()
-        return dict(row)if row else None
+        return ConversationInfo(**dict(row)) if row else None
     finally:
         conn.close()
 
@@ -94,7 +95,7 @@ def delete_conversation(conversation_id:str) -> bool:
     conn=get_db()
     try:
         cursor=conn.execute(
-            "delete from conversations where id=?",conversation_id)
+            "delete from conversations where id=?", (conversation_id,))
         conn.commit()
         return cursor.rowcount>0
     finally:
@@ -115,14 +116,14 @@ def get_messages(conversation_id:str)->list[dict]:
         conn.close()
 
 
-def get_conversation()->list[dict]:
+def get_conversations()->list[ConversationInfo]|list[dict]:
     conn=get_db()
     try:
         rows=conn.execute("""select id ,title,created_at,updated_at
         from conversations 
         order by updated_at desc""").fetchall()
         conn.commit()
-        return [dict(row)for row in rows]
+        return [ConversationInfo(**dict(row)) for row in rows]
     finally:
         conn.close()
 
@@ -131,20 +132,10 @@ def clear_messages(conversation_id:str)->bool:
     conn=get_db()
     try:
         cursor=conn.execute("""
-        delect 
+        delete 
         from messages 
-        where conversation_id=?""",conversation_id)
+        where conversation_id=?""", (conversation_id,))
         conn.commit()
         return cursor.rowcount>0
     finally:
         conn.close()
-
-if __name__ == "__main__":
-    init_db()
-    c = create_conversations("测试会话")
-    print("创建会话:", c)
-    print("查询会话:", get_conversations(c["id"]))
-    m = add_message(c["id"], "user", "你好")
-    print("添加消息:", m)
-    # 删会话，验证消息级联删除
-    # delete_conversation(c["id"])

@@ -1,7 +1,7 @@
 from app.llm import list_ollama_models
 from app.config import setting
 from fastapi import APIRouter
-from app.schemas import ModelInfo
+from app.schemas import ModelInfo,GeneralResponse
 
 router = APIRouter()
 
@@ -9,10 +9,5 @@ router = APIRouter()
 async def list_models() -> list[ModelInfo]:
     models = list_ollama_models()
     if not models:
-        models = [{
-            "id": f"ollama:{setting.ollama_default_model}",
-            "name": setting.ollama_default_model,
-            "provider": "ollama",
-            "local": True
-        }]
+        return GeneralResponse(ok=False, message="未找到可用模型")
     return models

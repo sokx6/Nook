@@ -27,8 +27,8 @@ class SSEChatData(BaseModel):
     '''SSE聊天流数据'''
     type: str = Field(default="message", description="数据类型")
     content: str = Field(default="", description="消息内容")
-    finish_reason: str = Field(default="", description="完成原因")
-    usage: UsageInfo = Field(default=None, description="用量信息")
+    finish_reason: str | None = Field(default="", description="完成原因")
+    usage: UsageInfo | None = Field(default=None, description="用量信息")
     
 class SSEChatResponse(BaseModel):
     '''SSE聊天流响应'''

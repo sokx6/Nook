@@ -1,17 +1,18 @@
 from collections.abc import AsyncGenerator
 from ollama import AsyncClient, Client
+from app.schemas import ModelInfo
 
-def list_ollama_models() -> list[dict]:
+def list_ollama_models() -> list[ModelInfo]:
     try:
         resp = Client(host="http://localhost:11434").list()
         result_list =[]
         for m in resp.models:
-            model_info = {
-                "id": f"ollama:{m.model}",
-                "name": m.model,
-                "provider": "ollama",
-                "local": True
-            }
+            model_info = ModelInfo(
+                id=f"ollama:{m.model}",
+                name=m.model,
+                provider="ollama",
+                local=True
+            )
             result_list.append(model_info)
         return result_list
 
@@ -52,3 +53,20 @@ def build_messages(system_prompt, history, user_message) -> list[dict]:
         for msg in history:
             messages.append({"role": msg["role"], "content": msg["content"]})
     return messages
+
+async def test(model_name: str) -> dict:
+    models = list_ollama_models()
+    print("Available Ollama Models:")
+    for model in models:
+        print(f"ID: {model['id']}, Name: {model['name']}, Provider: {model['provider']}, Local: {model['local']}")
+    model = models[0]["id"] if models else "ollama:qwen2.5:1.5b"
+    stream = stream_ollama(model, [{"role": "user", "content": "你现在是一个猫娘，请用猫娘的口吻回答我的问题。"}])
+    async for part in stream:
+        print(part, end="", flush=True)
+        
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(test("ollama:qwen2.5:1.5b"))
+
+
+    

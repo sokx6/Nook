@@ -38,7 +38,7 @@ class SSEChatResponse(BaseModel):
     
 class ChatRequest(BaseModel):
     '''聊天请求'''
-    message = str = Field(default=None, description="用户消息")
+    message: str = Field(default=None, description="用户消息")
     conversation_id: str = Field(default=None, description="会话ID")
     model: str = Field(default="qwen2.5:1.5b", description="模型名称")
     

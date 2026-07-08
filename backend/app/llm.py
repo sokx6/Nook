@@ -52,6 +52,7 @@ def build_messages(system_prompt, history, user_message) -> list[dict]:
     else:
         for msg in history:
             messages.append({"role": msg["role"], "content": msg["content"]})
+    messages.append({"role": "user", "content": user_message})
     return messages
 
 async def test(model_name: str) -> dict:

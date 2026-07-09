@@ -2,6 +2,30 @@
    Nook – Dark + Light Theme
    ======================================== */
 
+/* Smooth theme transition (antd-style) */
+html {
+  transition: background-color 0.3s ease;
+}
+
+body,
+#root,
+.ant-layout,
+.ant-layout-header,
+.ant-layout-content,
+.ant-layout-sider,
+.ant-btn,
+.ant-input,
+.ant-select-selector,
+.ant-message-notice-content,
+.ant-popover-inner,
+.ant-tooltip-inner {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease !important;
+}
+
 :root,
 [data-theme='dark'] {
   --ds-bg: #0d0d0d;

@@ -1,5 +1,11 @@
-import { Layout, Typography, ConfigProvider, theme, Button } from 'antd'
-import { CommentOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
+import { Layout, Typography, ConfigProvider, theme, Button, Tooltip } from 'antd'
+import {
+  CommentOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  SunOutlined,
+  MoonOutlined
+} from '@ant-design/icons'
 import Sidebar from '@/components/Sidebar'
 import ChatInput from '@/components/ChatInput'
 import ChatMessageItem from '@/components/ChatMessage'
@@ -11,14 +17,35 @@ const { Header, Content } = Layout
 const { Text } = Typography
 
 const MOBILE_WIDTH = 768
+const THEME_KEY = 'nook-theme'
+
+function getInitialTheme(): boolean {
+  try {
+    const stored = localStorage.getItem(THEME_KEY)
+    if (stored !== null) return stored === 'dark'
+  } catch {}
+  return true
+}
+
+function saveTheme(isDark: boolean) {
+  try {
+    localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light')
+  } catch {}
+}
 
 export default function App() {
   const { messages, isLoading } = useChatStore()
   const { conversations, currentId } = useConversationStore()
   const chatEndRef = useRef<HTMLDivElement>(null)
 
+  const [isDark, setIsDark] = useState(getInitialTheme)
   const [collapsed, setCollapsed] = useState(() => window.innerWidth < MOBILE_WIDTH)
   const [manualToggle, setManualToggle] = useState(false)
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
+    saveTheme(isDark)
+  }, [isDark])
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -42,14 +69,14 @@ export default function App() {
     setCollapsed((v) => !v)
   }
 
+  const toggleTheme = () => setIsDark((v) => !v)
+
   return (
     <ConfigProvider
       theme={{
-        algorithm: theme.darkAlgorithm,
+        algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
         token: {
-          colorPrimary: '#3b82f6',
-          colorBgContainer: 'var(--ds-bg)',
-          colorBgElevated: 'var(--ds-surface)',
+          colorPrimary: isDark ? '#3b82f6' : '#39C5BB',
           borderRadius: 10,
           fontFamily:
             '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
@@ -77,9 +104,28 @@ export default function App() {
               onClick={toggleSidebar}
               style={{ color: 'var(--ds-text-secondary)', fontSize: 16, borderRadius: 8 }}
             />
-            <Text style={{ color: 'var(--ds-text-primary)', fontSize: 14, fontWeight: 500 }}>
+            <Text
+              style={{
+                color: 'var(--ds-text-primary)',
+                fontSize: 14,
+                fontWeight: 500,
+                flex: 1
+              }}
+            >
               {currentConv ? currentConv.title : '新对话'}
             </Text>
+            <Tooltip title={isDark ? '切换到白天模式' : '切换到夜间模式'}>
+              <Button
+                type="text"
+                icon={isDark ? <SunOutlined /> : <MoonOutlined />}
+                onClick={toggleTheme}
+                style={{
+                  color: 'var(--ds-text-secondary)',
+                  fontSize: 16,
+                  borderRadius: 8
+                }}
+              />
+            </Tooltip>
           </Header>
 
           <Content style={{ flex: 1, overflow: 'hidden auto', padding: '24px 24px 0' }}>

@@ -13,7 +13,8 @@ export function useStreamChat() {
   } = useChatStore()
 
   const {
-    currentId, setCurrentId, createConversation, fetchConversations
+    currentId, setCurrentId, createConversation, fetchConversations,
+    cacheMessages, getCachedMessages, clearMessageCache
   } = useConversationStore()
 
   const { settings } = useSettingsStore()
@@ -79,6 +80,11 @@ export function useStreamChat() {
       updateLastAssistantMessage(msg)
     } finally {
       setIsLoading(false)
+      const currentMessages = useChatStore.getState().messages
+      const convIdForCache = useChatStore.getState().currentConversationId || currentId
+      if (convIdForCache) {
+        cacheMessages(convIdForCache, currentMessages)
+      }
       await fetchConversations()
     }
   }
@@ -138,46 +144,47 @@ export function useStreamChat() {
 
     setIsLoading(true)
 
-    addMessage({
+    const newAsst: Message = {
       id: uuid(),
       conversationId: convId,
       role: 'assistant',
       content: '',
       timestamp: Date.now()
-    })
+    }
 
-    setMessages([
-      ...filtered,
-      ...useChatStore.getState().messages.filter(
-        (m) => m.role === 'assistant' && m.content === ''
-      )
-    ])
+    const newMsgs = [...filtered, newAsst]
+    setMessages(newMsgs)
 
     await doStream(convId, lastUser.content)
   }, [
     currentConversationId, currentId, messages,
-    setIsLoading, addMessage, setMessages
+    setIsLoading, setMessages
   ])
 
   const handleDeleteMessage = useCallback(
-    async (messageId: string) => {
+    (messageId: string) => {
       const convId = currentConversationId || currentId
       if (!convId) return
 
       const msg = messages.find((m) => m.id === messageId)
       if (!msg) return
 
+      let newMsgs: Message[]
+
       if (msg.role === 'user') {
         const idx = messages.findIndex((m) => m.id === messageId)
         const next = messages[idx + 1]
         const toRemove = new Set([messageId])
         if (next?.role === 'assistant') toRemove.add(next.id)
-        setMessages(messages.filter((m) => !toRemove.has(m.id)))
+        newMsgs = messages.filter((m) => !toRemove.has(m.id))
       } else {
-        setMessages(messages.filter((m) => m.id !== messageId))
+        newMsgs = messages.filter((m) => m.id !== messageId)
       }
+
+      setMessages(newMsgs)
+      cacheMessages(convId, newMsgs)
     },
-    [currentConversationId, currentId, messages, setMessages]
+    [currentConversationId, currentId, messages, setMessages, cacheMessages]
   )
 
   const selectConversation = useCallback(
@@ -185,9 +192,10 @@ export function useStreamChat() {
       abortRef.current?.abort()
       setCurrentConversationId(id)
       setCurrentId(id)
-      setMessages([])
+      const cached = getCachedMessages(id)
+      setMessages(cached)
     },
-    [setCurrentConversationId, setCurrentId, setMessages]
+    [setCurrentConversationId, setCurrentId, setMessages, getCachedMessages]
   )
 
   const newChat = useCallback(() => {

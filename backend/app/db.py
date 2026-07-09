@@ -139,3 +139,20 @@ def clear_messages(conversation_id:str)->bool:
         return cursor.rowcount>0
     finally:
         conn.close()
+
+def delete_message(conversation_id: str, message_id: str) -> bool:
+    conn = get_db()
+    try:
+        cursor = conn.execute(
+            "delete from messages where id=? and conversation_id=?",
+            (message_id, conversation_id),
+        )
+        if cursor.rowcount > 0:
+            conn.execute(
+                "update conversations set updated_at=? where id=?",
+                (now(), conversation_id),
+            )
+        conn.commit()
+        return cursor.rowcount > 0
+    finally:
+        conn.close()

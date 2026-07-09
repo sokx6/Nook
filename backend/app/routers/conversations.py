@@ -24,6 +24,14 @@ async def get_all_conversations(response: Response) -> list[ConversationInfo] | 
         return GeneralResponse(ok=False, message="会话未找到")
     return [conv for conv in conversations]
 
+@router.get("/api/conversations/{conversation_id}/messages", summary="获取会话消息", description="根据会话ID获取该会话的所有消息")
+async def get_conversation_messages(conversation_id: str, response: Response) -> list[dict] | GeneralResponse:
+    messages = db.get_messages(conversation_id)
+    if not messages:
+        response.status_code = 404
+        return GeneralResponse(ok=False, message="消息未找到")
+    return messages
+
 @router.delete("/api/conversations/{conversation_id}", summary="删除会话", description="根据会话ID删除会话")
 async def delete_conversation(conversation_id: str, response: Response) -> GeneralResponse:
     success = db.delete_conversation(conversation_id)
@@ -39,3 +47,11 @@ async def clear_conversation_messages(conversation_id: str, response: Response) 
         response.status_code = 404
         return GeneralResponse(ok=False, message="会话未找到")
     return GeneralResponse(ok=True, message="会话消息已清空")
+
+@router.delete("/api/conversations/{conversation_id}/messages/{message_id}", summary="删除单条消息", description="根据会话ID和消息ID删除指定消息")
+async def delete_message(conversation_id: str, message_id: str, response: Response) -> GeneralResponse:
+    success = db.delete_message(conversation_id, message_id)
+    if not success:
+        response.status_code = 404
+        return GeneralResponse(ok=False, message="消息未找到")
+    return GeneralResponse(ok=True, message="消息已删除")

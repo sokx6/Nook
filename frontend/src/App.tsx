@@ -162,6 +162,7 @@ export default function App() {
                 color: 'var(--ds-text-primary)',
                 fontSize: 14,
                 fontWeight: 500,
+                textAlign: 'center',
                 flex: 1
               }}
             >

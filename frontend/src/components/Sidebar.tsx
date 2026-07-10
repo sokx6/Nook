@@ -71,6 +71,20 @@ export default function AppSidebar({ collapsed, onCollapse }: Props) {
           <Text strong style={{ color: 'var(--ds-text-primary)', fontSize: 16, letterSpacing: 1 }}>
             Nook
           </Text>
+
+          <Tooltip title="搜索" placement="right">
+            <Button
+              type="text"
+              icon={<SearchOutlined />}
+              style={{
+                color: 'var(--ds-text-secondary)',
+                borderRadius: 10,
+                flexShrink: 0,
+                marginLeft: 'auto' 
+              }}
+            />
+          </Tooltip>
+
           <Button
             type="text"
             size="small"
@@ -80,15 +94,8 @@ export default function AppSidebar({ collapsed, onCollapse }: Props) {
           />
         </div>
 
-        {/* Actions: New Chat + Search */}
-        <div
-          style={{
-            display: 'flex',
-            gap: 8,
-            padding: '12px 12px 8px',
-            borderBottom: '1px solid var(--ds-border)'
-          }}
-        >
+        {/* Conversation list */}
+        <div style={{ flex: 1, overflow: 'hidden auto', padding: '8px' }}>
           <Button
             type="primary"
             icon={<PlusOutlined />}
@@ -102,21 +109,7 @@ export default function AppSidebar({ collapsed, onCollapse }: Props) {
           >
             新建对话
           </Button>
-          <Tooltip title="搜索" placement="right">
-            <Button
-              type="text"
-              icon={<SearchOutlined />}
-              style={{
-                color: 'var(--ds-text-secondary)',
-                borderRadius: 10,
-                flexShrink: 0
-              }}
-            />
-          </Tooltip>
-        </div>
 
-        {/* Conversation list */}
-        <div style={{ flex: 1, overflow: 'hidden auto', padding: '8px' }}>
           {loading ? (
             <div style={{ padding: '24px', textAlign: 'center', color: 'var(--ds-text-tertiary)' }}>
               加载中...
@@ -222,22 +215,6 @@ export default function AppSidebar({ collapsed, onCollapse }: Props) {
             })
           )}
         </div>
-
-        {/* Footer trigger */}
-        <Button
-          type="text"
-          icon={<MenuFoldOutlined />}
-          onClick={() => onCollapse(true)}
-          style={{
-            color: 'var(--ds-text-tertiary)',
-            borderRadius: 0,
-            borderTop: '1px solid var(--ds-border)',
-            height: 40,
-            fontSize: 12
-          }}
-        >
-          收起侧边栏
-        </Button>
       </div>
     </Sider>
   )

@@ -189,3 +189,15 @@ def search_conversations_by_all(keyword: str) -> list[ConversationInfo]:
         return [ConversationInfo(**row) for row in rows]
     finally:
         conn.close()
+        
+def update_title(conversation_id: str, new_title: str) -> bool:
+    conn = get_db()
+    try:
+        cursor = conn.execute(
+            "UPDATE conversations SET title=?, updated_at=? WHERE id=?",
+            (new_title, now(), conversation_id),
+        )
+        conn.commit()
+        return cursor.rowcount > 0
+    finally:
+        conn.close()

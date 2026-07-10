@@ -72,7 +72,7 @@ export default function AppSidebar({ collapsed, onCollapse }: Props) {
             Nook
           </Text>
 
-          <Tooltip title="搜索" placement="right">
+          <Tooltip title="搜索" placement="bottom">
             <Button
               type="text"
               icon={<SearchOutlined />}
@@ -85,6 +85,7 @@ export default function AppSidebar({ collapsed, onCollapse }: Props) {
             />
           </Tooltip>
 
+          <Tooltip title="收起侧边栏" placement="bottom">
           <Button
             type="text"
             size="small"
@@ -92,6 +93,7 @@ export default function AppSidebar({ collapsed, onCollapse }: Props) {
             onClick={() => onCollapse(true)}
             style={{ color: 'var(--ds-text-secondary)', borderRadius: 8 }}
           />
+          </Tooltip>
         </div>
 
         {/* Conversation list */}

@@ -103,7 +103,7 @@ export default function App() {
                 gap: 6
               }}
             >
-              <Tooltip title="展开侧边栏" placement="right">
+              <Tooltip title="展开侧边栏" placement="bottom">
                 <Button
                   type="text"
                   icon={<MenuUnfoldOutlined />}
@@ -117,7 +117,7 @@ export default function App() {
                   }}
                 />
               </Tooltip>
-              <Tooltip title="搜索" placement="right">
+              <Tooltip title="搜索" placement="bottom">
                 <Button
                   type="text"
                   icon={<SearchOutlined />}
@@ -130,7 +130,7 @@ export default function App() {
                   }}
                 />
               </Tooltip>
-              <Tooltip title="新建对话" placement="right">
+              <Tooltip title="新建对话" placement="bottom">
                 <Button
                   type="text"
                   icon={<PlusOutlined />}

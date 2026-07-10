@@ -141,8 +141,17 @@ export default function ChatMessageItem({ message, isStreaming }: Props) {
           )}
         </div>
 
-        {isUser && !isStreaming && hovered && message.content && (
-          <div style={{ display: 'flex', gap: 4, marginTop: 6, justifyContent: 'flex-end' }}>
+        {isUser && !isStreaming && message.content && (
+          <div style={{
+            display: 'flex',
+            gap: 4,
+            marginTop: 6,
+            justifyContent: 'flex-end',
+            height: 26,
+            opacity: hovered ? 1 : 0,
+            transition: 'opacity 0.15s',
+            pointerEvents: hovered ? 'auto' : 'none'
+          }}>
             {actionButton(
               copied ? <CheckOutlined /> : <CopyOutlined />,
               '复制',
@@ -161,12 +170,25 @@ export default function ChatMessageItem({ message, isStreaming }: Props) {
           </div>
         )}
 
-        {!isUser && !isStreaming && hovered && message.content && (
-          <div style={{ display: 'flex', gap: 4, marginTop: 6 }}>
+        {!isUser && !isStreaming && message.content && (
+          <div style={{
+            display: 'flex',
+            gap: 4,
+            marginTop: 6,
+            height: 26,
+            opacity: hovered ? 1 : 0,
+            transition: 'opacity 0.15s',
+            pointerEvents: hovered ? 'auto' : 'none'
+          }}>
             {actionButton(
               copied ? <CheckOutlined /> : <CopyOutlined />,
               '复制',
               handleCopyButton
+            )}
+            {actionButton(
+              <DeleteOutlined />,
+              '删除',
+              (e) => { e.stopPropagation(); handleDeleteMessage(message.id) }
             )}
           </div>
         )}

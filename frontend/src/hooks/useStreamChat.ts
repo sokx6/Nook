@@ -135,32 +135,43 @@ export function useStreamChat() {
     setInput, setIsLoading, addMessage
   ])
 
-  const handleRegenerate = useCallback(async () => {
+  const handleRegenerate = useCallback(async (userMessageId: string) => {
     const convId = currentConversationId || currentId
     if (!convId) return
 
-    const lastUser = [...messages].reverse().find((m) => m.role === 'user')
-    const lastAsst = [...messages].reverse().find((m) => m.role === 'assistant')
-    if (!lastUser) return
+    const currentMessages = useChatStore.getState().messages
+    const userIdx = currentMessages.findIndex((m) => m.id === userMessageId)
+    if (userIdx === -1) return
 
-    const filtered = lastAsst
-      ? messages.filter((m) => m.id !== lastAsst.id)
-      : messages
+    const userMsg = currentMessages[userIdx]
+    const asstMsg = currentMessages[userIdx + 1]
+
+    const idsToRemove = new Set([userMsg.id])
+    if (asstMsg?.role === 'assistant') idsToRemove.add(asstMsg.id)
+
+    const filtered = currentMessages.filter((m) => !idsToRemove.has(m.id))
+    setMessages(filtered)
 
     setIsLoading(true)
 
-    const newAsst: Message = {
+    addMessage({
+      id: uuid(),
+      conversationId: convId,
+      role: 'user',
+      content: userMsg.content,
+      timestamp: Date.now()
+    })
+
+    addMessage({
       id: uuid(),
       conversationId: convId,
       role: 'assistant',
       content: '',
       timestamp: Date.now()
-    }
+    })
 
-    setMessages([...filtered, newAsst])
-
-    await doStream(convId, lastUser.content)
-  }, [currentConversationId, currentId, messages, setIsLoading, setMessages])
+    await doStream(convId, userMsg.content)
+  }, [currentConversationId, currentId, setIsLoading, setMessages, addMessage, doStream])
 
   const handleDeleteMessage = useCallback(
     async (messageId: string) => {

@@ -106,7 +106,8 @@ export default function AppSidebar({ collapsed, onCollapse }: Props) {
             style={{
               background: 'var(--ds-accent)',
               borderColor: 'var(--ds-accent)',
-              borderRadius: 10
+              borderRadius: 10,
+              marginBottom: 10
             }}
           >
             新建对话

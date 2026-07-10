@@ -135,13 +135,28 @@ export function useStreamChat() {
     setInput, setIsLoading, addMessage
   ])
 
-  const handleRegenerate = useCallback(async (userMessageId: string) => {
+  const handleRegenerate = useCallback(async (messageId: string) => {
     const convId = currentConversationId || currentId
     if (!convId) return
 
     const currentMessages = useChatStore.getState().messages
-    const userIdx = currentMessages.findIndex((m) => m.id === userMessageId)
-    if (userIdx === -1) return
+    let msgIdx = currentMessages.findIndex((m) => m.id === messageId)
+    if (msgIdx === -1) return
+
+    const target = currentMessages[msgIdx]
+    let userIdx: number
+    if (target.role === 'user') {
+      userIdx = msgIdx
+    } else {
+      userIdx = -1
+      for (let i = msgIdx - 1; i >= 0; i--) {
+        if (currentMessages[i].role === 'user') {
+          userIdx = i
+          break
+        }
+      }
+      if (userIdx === -1) return
+    }
 
     const userMsg = currentMessages[userIdx]
     const before = currentMessages.slice(0, userIdx)

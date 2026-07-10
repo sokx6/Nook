@@ -163,8 +163,8 @@ export default function SearchPanel({ open, onClose }: Props) {
             buttonStyle="solid"
             style={{ marginBottom: 8 }}
           >
-            <Radio.Button value="title">对话标题</Radio.Button>
-            <Radio.Button value="content">对话内容</Radio.Button>
+            <Radio.Button value="title">标题搜索</Radio.Button>
+            <Radio.Button value="content">全量搜索</Radio.Button>
           </Radio.Group>
         </div>
 
@@ -176,7 +176,7 @@ export default function SearchPanel({ open, onClose }: Props) {
           ) : searched && results.length === 0 ? (
             <Empty
               description={
-                <span style={{ color: 'var(--ds-text-tertiary)' }}>未找到相关对话</span>
+                <span style={{ color: 'var(--ds-text-tertiary)', marginBottom: 20 }}>未找到相关对话</span>
               }
               style={{ marginTop: 32 }}
             />

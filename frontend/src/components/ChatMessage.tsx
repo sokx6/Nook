@@ -158,11 +158,6 @@ export default function ChatMessageItem({ message, isStreaming }: Props) {
               handleCopyButton
             )}
             {actionButton(
-              <RedoOutlined />,
-              '重新生成',
-              (e) => { e.stopPropagation(); handleRegenerate(message.id) }
-            )}
-            {actionButton(
               <DeleteOutlined />,
               '删除',
               (e) => { e.stopPropagation(); handleDeleteMessage(message.id) }
@@ -184,6 +179,11 @@ export default function ChatMessageItem({ message, isStreaming }: Props) {
               copied ? <CheckOutlined /> : <CopyOutlined />,
               '复制',
               handleCopyButton
+            )}
+            {actionButton(
+              <RedoOutlined />,
+              '重新生成',
+              (e) => { e.stopPropagation(); handleRegenerate(message.id) }
             )}
             {actionButton(
               <DeleteOutlined />,

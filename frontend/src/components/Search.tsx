@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
-import { Input, Button, Radio, Typography, Empty, Spin } from 'antd'
+import { Input, Button, Radio, Typography, Empty, Spin, message } from 'antd'
 import {
   SearchOutlined,
   ArrowLeftOutlined,
   MessageOutlined
 } from '@ant-design/icons'
+import { useConversationStore } from '@/stores/conversationStore'
 import { useStreamChat } from '@/hooks/useStreamChat'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { Conversation } from '@/types'
@@ -19,7 +20,9 @@ interface Props {
 type SearchScope = 'title' | 'content'
 
 export default function SearchPanel({ open, onClose }: Props) {
+  const { conversations, fetchConversations } = useConversationStore()
   const { selectConversation } = useStreamChat()
+  const settings = useSettingsStore((s) => s.settings)
 
   const [keyword, setKeyword] = useState('')
   const [scope, setScope] = useState<SearchScope>('title')
@@ -30,7 +33,9 @@ export default function SearchPanel({ open, onClose }: Props) {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    if (!open) {
+    if (open) {
+      fetchConversations()
+    } else {
       setKeyword('')
       setResults([])
       setSearched(false)
@@ -39,36 +44,48 @@ export default function SearchPanel({ open, onClose }: Props) {
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
+
     if (!keyword.trim()) {
       setResults([])
       setSearched(false)
+      setLoading(false)
       return
     }
+
     setLoading(true)
+    const kw = keyword.trim()
+
     debounceRef.current = setTimeout(async () => {
       try {
-        const qs =
-          scope === 'title'
-            ? `tiitle_keyword=${encodeURIComponent(keyword.trim())}`
-            : `keyword=${encodeURIComponent(keyword.trim())}`
-        const baseUrl = useSettingsStore.getState().settings.baseUrl
-        const res = await fetch(`${baseUrl}/api/conversations?${qs}`, {
-          headers: { Accept: 'application/json' }
-        })
-        const data = await res.json()
-        setResults(Array.isArray(data) ? data : [])
+        if (scope === 'title') {
+          const filtered = conversations.filter((c) =>
+            c.title.toLowerCase().includes(kw.toLowerCase())
+          )
+          setResults(filtered)
+        } else {
+          const baseUrl = settings.baseUrl
+          const res = await fetch(
+            `${baseUrl}/api/conversations?keyword=${encodeURIComponent(kw)}`,
+            { headers: { Accept: 'application/json' } }
+          )
+          if (!res.ok) throw new Error('search failed')
+          const data = await res.json()
+          setResults(Array.isArray(data) ? data : [])
+        }
         setSearched(true)
       } catch {
+        message.error('搜索失败')
         setResults([])
         setSearched(true)
       } finally {
         setLoading(false)
       }
     }, 1000)
+
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
     }
-  }, [keyword, scope])
+  }, [keyword, scope, conversations])
 
   const handleSelect = (conv: Conversation) => {
     selectConversation(conv.id)

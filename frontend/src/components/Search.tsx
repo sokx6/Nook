@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Input, Button, Radio, Typography, Empty, Spin, message } from 'antd'
+import { Input, Button, Radio, Typography, Empty, Spin } from 'antd'
 import {
   SearchOutlined,
   ArrowLeftOutlined,
@@ -7,7 +7,6 @@ import {
 } from '@ant-design/icons'
 import { useConversationStore } from '@/stores/conversationStore'
 import { useStreamChat } from '@/hooks/useStreamChat'
-import { useSettingsStore } from '@/stores/settingsStore'
 import { Conversation } from '@/types'
 
 const { Text } = Typography
@@ -20,9 +19,8 @@ interface Props {
 type SearchScope = 'title' | 'content'
 
 export default function SearchPanel({ open, onClose }: Props) {
-  const { conversations, fetchConversations } = useConversationStore()
+  const { conversations, fetchConversations, fetchMessages } = useConversationStore()
   const { selectConversation } = useStreamChat()
-  const settings = useSettingsStore((s) => s.settings)
 
   const [keyword, setKeyword] = useState('')
   const [scope, setScope] = useState<SearchScope>('title')
@@ -53,29 +51,30 @@ export default function SearchPanel({ open, onClose }: Props) {
     }
 
     setLoading(true)
-    const kw = keyword.trim()
+    const kw = keyword.trim().toLowerCase()
 
     debounceRef.current = setTimeout(async () => {
       try {
         if (scope === 'title') {
           const filtered = conversations.filter((c) =>
-            c.title.toLowerCase().includes(kw.toLowerCase())
+            c.title.toLowerCase().includes(kw)
           )
           setResults(filtered)
         } else {
-          const baseUrl = settings.baseUrl
-          const res = await fetch(
-            `${baseUrl}/api/conversations?keyword=${encodeURIComponent(kw)}`,
-            { headers: { Accept: 'application/json' } }
-          )
-          if (!res.ok) throw new Error('search failed')
-          const data = await res.json()
-          setResults(Array.isArray(data) ? data : [])
+          const matched: Conversation[] = []
+          for (const conv of conversations) {
+            try {
+              const msgs = await fetchMessages(conv.id)
+              const hasMatch = msgs.some((m) =>
+                m.content.toLowerCase().includes(kw)
+              )
+              if (hasMatch) matched.push(conv)
+            } catch {
+              // skip failed fetches
+            }
+          }
+          setResults(matched)
         }
-        setSearched(true)
-      } catch {
-        message.error('搜索失败')
-        setResults([])
         setSearched(true)
       } finally {
         setLoading(false)

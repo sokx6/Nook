@@ -93,11 +93,24 @@ export default function App() {
         <Sidebar collapsed={collapsed} onCollapse={setCollapsed} onSearchOpen={() => setSearchOpen(true)} />
 
         <Layout style={{ background: 'var(--ds-bg)', position: 'relative' }}>
+
+          <Header
+            style={{
+              background: 'var(--ds-bg)',
+              borderBottom: '1px solid var(--ds-border)',
+              padding: '0 24px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              height: 56
+            }}
+          >
+
           {/* Floating buttons when sidebar collapsed */}
           {collapsed && (
             <div
               style={{
-                position: 'absolute',
+                marginRight: 'auto' ,
                 top: 12,
                 left: 12,
                 zIndex: 100,
@@ -148,18 +161,6 @@ export default function App() {
               </Tooltip>
             </div>
           )}
-
-          <Header
-            style={{
-              background: 'var(--ds-bg)',
-              borderBottom: '1px solid var(--ds-border)',
-              padding: '0 24px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              height: 56
-            }}
-          >
             <Text
               style={{
                 color: 'var(--ds-text-primary)',

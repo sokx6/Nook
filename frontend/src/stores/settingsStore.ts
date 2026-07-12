@@ -9,7 +9,7 @@ interface SettingsState {
 const defaults: AppSettings = {
   apiKey: '',
   baseUrl: 'http://localhost:8000',
-  model: 'Qwen2.5-1.5b'
+  model: 'qwen2.5:1.5b'
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({

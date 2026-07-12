@@ -1,10 +1,11 @@
 from collections.abc import AsyncGenerator
 from ollama import AsyncClient, Client
+from app.config import setting
 from app.schemas import ModelInfo
 
 def list_ollama_models() -> list[ModelInfo]:
     try:
-        resp = Client(host="http://localhost:11434").list()
+        resp = Client(host=setting.ollama_host).list()
         result_list =[]
         for m in resp.models:
             model_info = ModelInfo(
@@ -20,7 +21,7 @@ def list_ollama_models() -> list[ModelInfo]:
         return []
 
 async def stream_ollama(model, messages, temperature = 0.7) -> AsyncGenerator[str, None]:
-    client = AsyncClient(host = "http://Localhost:11434")
+    client = AsyncClient(host=setting.ollama_host)
     if model.startswith("ollama:"):
         model_name = model.replace("ollama:", "", 1)
     else:
@@ -33,7 +34,17 @@ async def stream_ollama(model, messages, temperature = 0.7) -> AsyncGenerator[st
     ):
         if part.message.content:
             yield part.message.content
-
+        
+async def pull_ollama_model(model_name: str) -> bool:
+    try:
+        client = AsyncClient(host=setting.ollama_host)
+        if model_name.startswith("ollama:"):
+            model_name = model_name.replace("ollama:", "", 1)
+        await client.pull(model_name)
+        return True
+    except Exception as e:
+        return False
+    
 def build_system_prompt(base = None, skill = None, memories = None) -> str:
     parts = []
     base_prompt = base or ("Your name is Nook and you are a helpful AI assistant running locally"+"Respond in the same language as the user.Be concise and helpful.")

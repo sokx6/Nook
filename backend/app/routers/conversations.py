@@ -74,7 +74,7 @@ async def search_conversations_by_content(keyword: str, response: Response) -> l
 
 @router.put("/api/conversations/{conversation_id}/title", summary="修改会话标题", description="根据会话ID修改会话标题")
 async def update_conversation_title(conversation_id: str, request: ModifyTitleRequest, response: Response) -> GeneralResponse:
-    success = db.update_conversation_title(conversation_id, request.new_title)
+    success = db.update_title(conversation_id, request.new_title)
     if not success:
         response.status_code = 404
         return GeneralResponse(ok=False, message="会话未找到")

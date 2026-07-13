@@ -1,11 +1,8 @@
 {
   "name": "nook",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Local AI Chat Application",
   "keywords": [
-    "UI",
-    "frontend",
-    "electron",
     "ai",
     "chat"
   ],
@@ -13,8 +10,8 @@
     "type": "git",
     "url": "tbf"
   },
-  "license": "MIT",
-  "author": "anrans",
+  "license": "GPL-3.0-only",
+  "author": "NookWorks",
   "main": "./dist-electron/main.js",
   "scripts": {
     "dev": "electron-vite dev",

@@ -4,7 +4,6 @@ import {
   RedoOutlined,
   DeleteOutlined,
   CheckOutlined,
-  RobotOutlined,
   UserOutlined
 } from '@ant-design/icons'
 import type { Message } from '@/types'
@@ -12,6 +11,7 @@ import { useStreamChat } from '@/hooks/useStreamChat'
 import { useState, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Highlight, themes } from 'prism-react-renderer'
+import logoIcon from '@/renderer/assets/logo.svg'
 
 function CodeBlock({ language, code }: { language: string; code: string }) {
   const [copied, setCopied] = useState(false)
@@ -182,7 +182,7 @@ export default function ChatMessageItem({ message, isStreaming }: Props) {
         {isUser ? (
           <UserOutlined style={{ color: '#fff', fontSize: 14 }} />
         ) : (
-          <RobotOutlined style={{ color: 'var(--ds-accent)', fontSize: 14 }} />
+          <img src={logoIcon} alt="Nook" style={{ width: 18, height: 18 }} />
         )}
       </div>
 

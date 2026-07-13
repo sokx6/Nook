@@ -100,6 +100,7 @@ function createWindow(): void {
     minWidth: 800,
     minHeight: 600,
     title: 'Nook - AI Chat',
+    icon: join(__dirname, '../src/renderer/assets/logo.svg'),
     backgroundColor: '#0d0d0d',
     webPreferences: {
       preload: join(__dirname, 'preload.js'),

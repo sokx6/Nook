@@ -12,6 +12,8 @@ import { useConversationStore } from '@/stores/conversationStore'
 import { useStreamChat } from '@/hooks/useStreamChat'
 import { useEffect, useState } from 'react'
 import type { MenuProps } from 'antd'
+import nookLogo from '@/renderer/assets/nook.svg'
+import nookLogoDark from '@/renderer/assets/nook_dark.svg'
 
 const { Sider } = Layout
 const { Text } = Typography
@@ -30,9 +32,20 @@ export default function AppSidebar({ collapsed, onCollapse, onSearchOpen }: Prop
   const [renameOpen, setRenameOpen] = useState(false)
   const [renameId, setRenameId] = useState<string | null>(null)
   const [renameValue, setRenameValue] = useState('')
+  const [isDark, setIsDark] = useState(
+    () => document.documentElement.getAttribute('data-theme') === 'dark'
+  )
 
   useEffect(() => {
     fetchConversations()
+  }, [])
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.getAttribute('data-theme') === 'dark')
+    })
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => observer.disconnect()
   }, [])
 
   const handleDelete = (id: string) => {
@@ -123,9 +136,7 @@ export default function AppSidebar({ collapsed, onCollapse, onSearchOpen }: Prop
             transition: 'background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease'
           }}
         >
-          <Text strong style={{ color: 'var(--ds-text-primary)', fontSize: 16, letterSpacing: 1 }}>
-            Nook
-          </Text>
+          <img src={isDark ? nookLogoDark : nookLogo} alt="Nook" style={{ height: 20 }} />
 
           <Tooltip title="搜索" placement="bottom">
             <Button

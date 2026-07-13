@@ -49,14 +49,23 @@ Filename: "{tmp}\OllamaSetup.exe"; Parameters: "/S"; StatusMsg: "Installing Olla
 Type: filesandordirs; Name: "{app}"
 
 [Code]
+var
+  DownloadPage: TDownloadWizardPage;
+
 function IsOllamaInstalled: Boolean;
 begin
-  Result :=
-    FileSearch('ollama.exe', GetEnv('PATH')) <> '' or
-    RegKeyExists(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\Ollama') or
-    RegKeyExists(HKLM, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\Ollama') or
-    FileExists(ExpandConstant('{localappdata}\Programs\Ollama\ollama.exe')) or
-    FileExists(ExpandConstant('{autopf}\Ollama\ollama.exe'));
+  Result := FileSearch('ollama.exe', GetEnv('PATH')) <> '';
+  if not Result then
+    Result := RegKeyExists(HKCU,
+      'Software\Microsoft\Windows\CurrentVersion\Uninstall\Ollama');
+  if not Result then
+    Result := RegKeyExists(HKLM,
+      'Software\Microsoft\Windows\CurrentVersion\Uninstall\Ollama');
+  if not Result then
+    Result := FileExists(ExpandConstant(
+      '{localappdata}\Programs\Ollama\ollama.exe'));
+  if not Result then
+    Result := FileExists(ExpandConstant('{autopf}\Ollama\ollama.exe'));
 end;
 
 function ShouldInstallOllama: Boolean;
@@ -64,26 +73,41 @@ begin
   Result := not IsOllamaInstalled;
 end;
 
-function DownloadProgress(const Url, FileName: String;
-  const Progress, ProgressMax: Int64): Boolean;
+procedure InitializeWizard;
 begin
-  Result := True;
+  DownloadPage := CreateDownloadPage(
+    SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), nil);
+  DownloadPage.ShowBaseNameInsteadOfUrl := True;
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
+var
+  Error: String;
 begin
-  Result := True;
   if (CurPageID = wpReady) and ShouldInstallOllama then begin
+    DownloadPage.Clear;
+    DownloadPage.Add('https://ollama.com/download/OllamaSetup.exe',
+      'OllamaSetup.exe', '');
+    DownloadPage.Show;
     try
-      DownloadTemporaryFile(
-        'https://ollama.com/download/OllamaSetup.exe',
-        'OllamaSetup.exe', '', @DownloadProgress);
-    except
-      MsgBox('Unable to download Ollama. Check your connection and try again.',
-        mbError, MB_OK);
-      Result := False;
+      try
+        DownloadPage.Download;
+        Result := True;
+      except
+        if DownloadPage.AbortedByUser then
+          Log('Ollama download aborted by user.')
+        else begin
+          Error := Format('%s: %s', [DownloadPage.LastBaseNameOrUrl,
+            GetExceptionMessage]);
+          SuppressibleMsgBox(AddPeriod(Error), mbCriticalError, MB_OK, IDOK);
+        end;
+        Result := False;
+      end;
+    finally
+      DownloadPage.Hide;
     end;
-  end;
+  end else
+    Result := True;
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);

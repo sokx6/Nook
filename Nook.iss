@@ -1,7 +1,9 @@
 ; Nook Windows installer (Inno Setup 6)
 
 #define MyAppName "Nook"
-#define MyAppVersion "1.0.0"
+#ifndef MyAppVersion
+  #define MyAppVersion "0.0.1"
+#endif
 #define MyAppPublisher "NookWorks"
 #define MyAppURL "https://github.com/sokx6/Nook"
 #define MyAppExeName "Nook.exe"

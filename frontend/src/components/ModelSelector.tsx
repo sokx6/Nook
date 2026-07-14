@@ -6,6 +6,10 @@ import { useSettingsStore } from "@/stores/settingsStore";
 const { Text } = Typography;
 
 const DOWNLOADABLE_MODELS = [
+	{ name: "qwen2.5:0.5b", size: "~400MB" },
+	{ name: "qwen2.5:1.5b", size: "~1.0GB" },
+	{ name: "qwen2.5:3b", size: "~1.9GB" },
+	{ name: "qwen2.5:7b", size: "~4.7GB" },
 	{ name: "qwen3:0.6b", size: "~400MB" },
 	{ name: "qwen3:1.8b", size: "~1.1GB" },
 	{ name: "qwen3:4b", size: "~2.4GB" },
@@ -64,6 +68,7 @@ export default function ModelSelectorHeader() {
 			const data = await res.json();
 			if (data.ok) {
 				setDownloadedModels((prev) => new Set(prev).add(modelName));
+				fetchModels();
 				message.success(`${modelName} 下载完成`);
 				fetchModels();
 				updateSettings({ model: `ollama:${modelName}` });
@@ -118,6 +123,7 @@ export default function ModelSelectorHeader() {
 				onChange={(v) => {
 					if (v === "__download__") {
 						setDownloadOpen(true);
+            fetchModels()
 						return;
 					}
 					updateSettings({ model: v });
@@ -157,21 +163,22 @@ export default function ModelSelectorHeader() {
 									display: "flex",
 									alignItems: "center",
 									justifyContent: "space-between",
+									gap: 12,
 									padding: "10px 12px",
 									borderRadius: 8,
 								}}
 							>
-								<div>
-									<Text style={{ fontSize: 13 }}>{m.name}</Text>
+								<div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center' }}>
+									<Text style={{ fontSize: 13 }} ellipsis>{m.name}</Text>
 									<Text
 										type="secondary"
-										style={{ fontSize: 11, marginLeft: 8 }}
+										style={{ fontSize: 11, marginLeft: 8, flexShrink: 0 }}
 									>
 										{m.size}
 									</Text>
 								</div>
 								{installed ? (
-									<Text type="success" style={{ fontSize: 12 }}>
+									<Text type="success" style={{ fontSize: 12, flexShrink: 0 }}>
 										<CheckCircleOutlined style={{ marginRight: 4 }} />
 										已安装
 									</Text>
@@ -182,7 +189,7 @@ export default function ModelSelectorHeader() {
 										loading={isDownloading}
 										icon={<DownloadOutlined />}
 										onClick={() => handleDownload(m.name)}
-										style={{ borderRadius: 8 }}
+										style={{ borderRadius: 8, flexShrink: 0 }}
 									>
 										{isDownloading ? "下载中" : "下载"}
 									</Button>
